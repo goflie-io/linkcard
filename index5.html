@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>フルはこちら</title>
 
-  <!-- OGP -->
+  <!-- OGP（Threadsカード用） -->
   <meta property="og:title" content="フルはこちら">
   <meta property="og:description" content="タップで開く">
   <meta property="og:type" content="website">
@@ -20,35 +20,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <script>
+    // あなたの招待リンク（ここだけ差し替え）
     const TARGET = "https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/";
 
-    function go(){
-      // Threads内ブラウザでも通りやすい順に実行
-      window.location.assign(TARGET);
-      setTimeout(()=>{ window.location.href = TARGET; }, 30);
-      setTimeout(()=>{ window.location.replace(TARGET); }, 80);
-    }
+    // Androidで「外部ブラウザ/アプリ起動」を狙う（失敗したら通常URLへ）
+    const INTENT = "intent://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/#Intent;scheme=https;package=com.zhiliaoapp.musically;end";
 
-    window.addEventListener("DOMContentLoaded", () => {
-      // 「ユーザー操作」起点にするのがThreadsで最強
-      document.body.addEventListener("click", go, { once:true });
-      document.body.addEventListener("touchstart", go, { once:true, passive:true });
-    });
+    function openExternal(){
+      // 1) まず intent を試す（Android）
+      try { window.location.href = INTENT; } catch(e) {}
+
+      // 2) うまくいかなかった時の保険：新規タブで開く（外部ブラウザに行きやすい）
+      setTimeout(() => {
+        const a = document.createElement("a");
+        a.href = TARGET;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.click();
+      }, 120);
+
+      // 3) 最後の保険：通常遷移
+      setTimeout(() => { window.location.href = TARGET; }, 350);
+    }
   </script>
 
   <style>
     body{font-family:system-ui; text-align:center; padding:42px 18px;}
     .btn{display:inline-block; padding:16px 22px; font-size:18px; border-radius:12px;
          border:1px solid #ddd; text-decoration:none;}
-    .sub{margin-top:12px; color:#777; font-size:13px;}
+    .sub{margin-top:12px; color:#666; font-size:13px; line-height:1.5;}
+    .tips{margin-top:18px; color:#888; font-size:12px; line-height:1.6;}
+    .box{max-width:420px; margin:0 auto;}
   </style>
 </head>
 
 <body>
-  <h1 style="font-size:22px; margin:0 0 12px;">タップでフル版へ移動</h1>
+  <div class="box">
+    <h1 style="font-size:22px; margin:0 0 12px;">フル版を開く</h1>
 
-  <a class="btn" href="https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/">▶ フル版を開く</a>
+    <!-- 重要：ここを押させる（ユーザー操作起点） -->
+    <a class="btn" href="javascript:void(0)" onclick="openExternal()">▶ フル版を開く</a>
 
-  <div class="sub">※画面のどこをタップしても開きます</div>
+    <div class="sub">開かない場合は、右上「…」→「ブラウザで開く」を試してください</div>
+    <div class="tips">※Threads内ブラウザだとTikTok側の確認画面が出ることがあります</div>
+  </div>
 </body>
 </html>
