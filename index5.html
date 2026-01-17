@@ -2,42 +2,210 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
   <title>フルはこちら</title>
 
-  <!-- OGP（カード用） -->
+  <!-- =========================
+       OGP（Threadsのリンクカード用）
+       ========================= -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="フルはこちら" />
-  <meta property="og:description" content="タップして視聴できます。" />
+  <meta property="og:description" content="気になる人はタップ" />
+  <!-- ここを「バズってる画像」に差し替え -->
   <meta property="og:image" content="https://video-twimg-how.github.io/linkcard/card5.jpg" />
   <meta property="og:url" content="https://video-twimg-how.github.io/linkcard/index5.html" />
+  <meta property="og:site_name" content="video-twimg-how.github.io" />
+
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="フルはこちら" />
+  <meta name="twitter:description" content="気になる人はタップ" />
+  <meta name="twitter:image" content="https://video-twimg-how.github.io/linkcard/card5.jpg" />
 
   <style>
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP",sans-serif;background:#fff}
-    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
-    .card{width:min(520px,100%);border-radius:22px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.12)}
-    .thumb{background:#000;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative}
-    .btn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:999px;padding:14px 22px;font-weight:800}
-    .txt{background:#fff;padding:18px 18px 22px;color:#111;line-height:1.5}
-    .sub{color:#666;font-size:14px;margin-top:10px}
-    /* 押せない対策：全面タップ */
-    a.fulltap{position:absolute;inset:0;display:block}
+    :root { color-scheme: light; }
+    html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif; background:#fff; }
+    .wrap {
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    .card {
+      width:min(520px, 92vw);
+      border-radius:20px;
+      border:1px solid #e7e7e7;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+      overflow:hidden;
+      background:#fff;
+    }
+    .hero {
+      position:relative;
+      aspect-ratio: 16 / 9;
+      background:#f2f2f2;
+    }
+    .hero img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .overlay {
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.25));
+    }
+    .btn {
+      appearance:none;
+      border:none;
+      border-radius:999px;
+      padding:14px 22px;
+      font-size:16px;
+      font-weight:700;
+      background:#ffffff;
+      color:#111;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      cursor:pointer;
+      box-shadow:0 8px 20px rgba(0,0,0,.18);
+    }
+    .sub {
+      padding:14px 16px 18px;
+      color:#333;
+      font-size:14px;
+      line-height:1.5;
+    }
+    .hint {
+      margin-top:8px;
+      color:#666;
+      font-size:12px;
+    }
+    .tiny {
+      margin-top:10px;
+      color:#888;
+      font-size:12px;
+      line-height:1.4;
+    }
+    .fulltap {
+      position:fixed;
+      inset:0;
+      background:transparent;
+      display:none;
+    }
   </style>
 </head>
+
 <body>
+  <!-- 画面全体タップでも起動トライできるように -->
+  <div class="fulltap" id="fulltap" aria-hidden="true"></div>
+
   <div class="wrap">
-    <div class="card">
-      <div class="thumb">
-        <div class="btn">▶ フルを開く</div>
-        <!-- ここをタップすると go5.html へ -->
-        <a class="fulltap" href="go5.html" rel="noopener"></a>
+    <div class="card" role="main">
+      <div class="hero">
+        <!-- OGPと同じ画像にしておくと「見た目の一貫性」出る -->
+        <img src="https://video-twimg-how.github.io/linkcard/card5.jpg" alt="preview" />
+        <div class="overlay">
+          <button class="btn" id="openBtn" type="button" aria-label="TikTokLiteで開く">
+            ▶ フルを開く
+          </button>
+        </div>
       </div>
-      <div class="txt">
-        タップすると動画が視聴できます。
-        <div class="sub">開かない時は右上「…」→「ブラウザで開く」</div>
+      <div class="sub">
+        画面をタップするとTikTokLiteが開きます
+        <div class="hint">（開かない時は 右上「…」→「ブラウザで開く」）</div>
+        <div class="tiny" id="status"></div>
       </div>
     </div>
   </div>
+
+  <script>
+    // ====== あなたの招待リンク（ここだけ差し替えればOK） ======
+    const TIKTOK_LITE_URL = "https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/";
+
+    // Androidで「アプリを開く」成功率を上げるため intent:// を併用
+    // ※端末/地域でパッケージ名が異なる可能性があるので “複数” 試す
+    function makeIntent(url, pkg) {
+      // url: https://lite.tiktok.com/t/xxxx  → intent://lite.tiktok.com/t/xxxx#Intent;scheme=https;package=...;end
+      const u = new URL(url);
+      return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=${u.protocol.replace(":","")};package=${pkg};end`;
+    }
+
+    const ANDROID_INTENTS = [
+      // TikTok Lite / TikTok でよくある候補（端末により異なる）
+      makeIntent(TIKTOK_LITE_URL, "com.ss.android.ugc.trill"),     // TikTok Lite で使われることがある
+      makeIntent(TIKTOK_LITE_URL, "com.zhiliaoapp.musically"),     // TikTok で多い
+    ];
+
+    const statusEl = document.getElementById("status");
+    const openBtn  = document.getElementById("openBtn");
+    const fulltap  = document.getElementById("fulltap");
+
+    function isInAppBrowser() {
+      const ua = navigator.userAgent || "";
+      // Threads/Instagram内ブラウザっぽいものを広く拾う
+      return /Threads|Instagram|FBAN|FBAV/i.test(ua);
+    }
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    // “最短でアプリへ” を狙う三段構え
+    // 1) 通常URL（アプリリンク対応端末ならこれでアプリが開く）
+    // 2) intent://（Androidで強め）
+    // 3) だめなら最後に通常URLへ戻す（ブラウザ表示でも救済）
+    function tryOpenApp() {
+      setStatus("起動しています…");
+
+      // ① まず通常URL（Universal/App Links が効くならここでアプリへ）
+      location.href = TIKTOK_LITE_URL;
+
+      // ② Android intent を時間差で複数回（Threads内だと一部ブロックされることがあるのでタップも併用）
+      let t = 250;
+      ANDROID_INTENTS.forEach((intent) => {
+        setTimeout(() => { location.href = intent; }, t);
+        t += 250;
+      });
+
+      // ③ 最後の保険（ページが残ってるなら案内を出す）
+      setTimeout(() => {
+        if (isInAppBrowser()) {
+          setStatus("開かない場合：右上「…」→「ブラウザで開く」を試してください。");
+        } else {
+          setStatus("開かない場合：もう一度タップしてください。");
+        }
+      }, 1200);
+    }
+
+    // 自動トライ（※Threads内だと“自動起動”が弾かれることがある）
+    // → それでも「端末によっては開く」ので、やる価値はある
+    function autoKick() {
+      // すぐ飛ぶと怪しまれることがあるので、ほんの少し遅らせる
+      setTimeout(() => {
+        tryOpenApp();
+      }, 350);
+    }
+
+    // ユーザー操作（タップ）があるとブロックされにくい
+    openBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      tryOpenApp();
+    });
+
+    fulltap.addEventListener("click", (e) => {
+      e.preventDefault();
+      tryOpenApp();
+    });
+
+    // 全画面タップ有効化（“押しやすさ”）
+    fulltap.style.display = "block";
+
+    // 初回は自動で一度だけ試す
+    autoKick();
+  </script>
 </body>
 </html>
