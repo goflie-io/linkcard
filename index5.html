@@ -7,21 +7,15 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
   <title>フルはこちら</title>
 
-  <!-- =========================
-       OGP（Threadsのリンクカード用）
-       ========================= -->
+  <!-- OGP -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="フルはこちら" />
   <meta property="og:description" content="気になる人はタップ" />
-  <!-- ここを「バズってる画像」に差し替え -->
   <meta property="og:image" content="https://video-twimg-how.github.io/linkcard/card5.jpg" />
   <meta property="og:url" content="https://video-twimg-how.github.io/linkcard/index5.html" />
   <meta property="og:site_name" content="video-twimg-how.github.io" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="フルはこちら" />
-  <meta name="twitter:description" content="気になる人はタップ" />
-  <meta name="twitter:image" content="https://video-twimg-how.github.io/linkcard/card5.jpg" />
 
   <style>
     :root { color-scheme: light; }
@@ -44,7 +38,7 @@
     .hero {
       position:relative;
       aspect-ratio: 16 / 9;
-      background:#f2f2f2;
+      background:#000;
     }
     .hero img {
       width:100%;
@@ -96,116 +90,90 @@
       position:fixed;
       inset:0;
       background:transparent;
-      display:none;
+      display:block;
     }
   </style>
 </head>
 
 <body>
-  <!-- 画面全体タップでも起動トライできるように -->
-  <div class="fulltap" id="fulltap" aria-hidden="true"></div>
+  <div class="fulltap" id="fulltap"></div>
 
   <div class="wrap">
-    <div class="card" role="main">
+    <div class="card">
       <div class="hero">
-        <!-- OGPと同じ画像にしておくと「見た目の一貫性」出る -->
         <img src="https://video-twimg-how.github.io/linkcard/card5.jpg" alt="preview" />
         <div class="overlay">
-          <button class="btn" id="openBtn" type="button" aria-label="TikTokLiteで開く">
-            ▶ フルを開く
+          <button class="btn" id="openBtn" type="button">
+            ▶ フルを再生
           </button>
         </div>
       </div>
       <div class="sub">
-        画面をタップするとTikTokLiteが開きます
-        <div class="hint">（開かない時は 右上「…」→「ブラウザで開く」）</div>
+        タップするとフル動画を視聴できます。
+        <div class="hint">※開かない場合は右上「…」→「ブラウザで開く」</div>
         <div class="tiny" id="status"></div>
       </div>
     </div>
   </div>
 
-  <script>
-    // ====== あなたの招待リンク（ここだけ差し替えればOK） ======
-    const TIKTOK_LITE_URL = "https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/";
+<script>
+  const TARGET_URL = "https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/";
 
-    // Androidで「アプリを開く」成功率を上げるため intent:// を併用
-    // ※端末/地域でパッケージ名が異なる可能性があるので “複数” 試す
-    function makeIntent(url, pkg) {
-      // url: https://lite.tiktok.com/t/xxxx  → intent://lite.tiktok.com/t/xxxx#Intent;scheme=https;package=...;end
-      const u = new URL(url);
-      return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=${u.protocol.replace(":","")};package=${pkg};end`;
-    }
+  function makeIntent(url, pkg) {
+    const u = new URL(url);
+    return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=${u.protocol.replace(":","")};package=${pkg};end`;
+  }
 
-    const ANDROID_INTENTS = [
-      // TikTok Lite / TikTok でよくある候補（端末により異なる）
-      makeIntent(TIKTOK_LITE_URL, "com.ss.android.ugc.trill"),     // TikTok Lite で使われることがある
-      makeIntent(TIKTOK_LITE_URL, "com.zhiliaoapp.musically"),     // TikTok で多い
-    ];
+  const ANDROID_INTENTS = [
+    makeIntent(TARGET_URL, "com.ss.android.ugc.trill"),
+    makeIntent(TARGET_URL, "com.zhiliaoapp.musically"),
+  ];
 
-    const statusEl = document.getElementById("status");
-    const openBtn  = document.getElementById("openBtn");
-    const fulltap  = document.getElementById("fulltap");
+  const statusEl = document.getElementById("status");
+  const openBtn  = document.getElementById("openBtn");
+  const fulltap  = document.getElementById("fulltap");
 
-    function isInAppBrowser() {
-      const ua = navigator.userAgent || "";
-      // Threads/Instagram内ブラウザっぽいものを広く拾う
-      return /Threads|Instagram|FBAN|FBAV/i.test(ua);
-    }
+  function isInAppBrowser() {
+    const ua = navigator.userAgent || "";
+    return /Threads|Instagram|FBAN|FBAV/i.test(ua);
+  }
 
-    function setStatus(msg) { statusEl.textContent = msg; }
+  function setStatus(msg) { statusEl.textContent = msg; }
 
-    // “最短でアプリへ” を狙う三段構え
-    // 1) 通常URL（アプリリンク対応端末ならこれでアプリが開く）
-    // 2) intent://（Androidで強め）
-    // 3) だめなら最後に通常URLへ戻す（ブラウザ表示でも救済）
-    function tryOpenApp() {
-      setStatus("起動しています…");
+  function tryOpen() {
+    setStatus("読み込み中…");
 
-      // ① まず通常URL（Universal/App Links が効くならここでアプリへ）
-      location.href = TIKTOK_LITE_URL;
+    location.href = TARGET_URL;
 
-      // ② Android intent を時間差で複数回（Threads内だと一部ブロックされることがあるのでタップも併用）
-      let t = 250;
-      ANDROID_INTENTS.forEach((intent) => {
-        setTimeout(() => { location.href = intent; }, t);
-        t += 250;
-      });
-
-      // ③ 最後の保険（ページが残ってるなら案内を出す）
-      setTimeout(() => {
-        if (isInAppBrowser()) {
-          setStatus("開かない場合：右上「…」→「ブラウザで開く」を試してください。");
-        } else {
-          setStatus("開かない場合：もう一度タップしてください。");
-        }
-      }, 1200);
-    }
-
-    // 自動トライ（※Threads内だと“自動起動”が弾かれることがある）
-    // → それでも「端末によっては開く」ので、やる価値はある
-    function autoKick() {
-      // すぐ飛ぶと怪しまれることがあるので、ほんの少し遅らせる
-      setTimeout(() => {
-        tryOpenApp();
-      }, 350);
-    }
-
-    // ユーザー操作（タップ）があるとブロックされにくい
-    openBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      tryOpenApp();
+    let t = 250;
+    ANDROID_INTENTS.forEach((intent) => {
+      setTimeout(() => { location.href = intent; }, t);
+      t += 250;
     });
 
-    fulltap.addEventListener("click", (e) => {
-      e.preventDefault();
-      tryOpenApp();
-    });
+    setTimeout(() => {
+      if (isInAppBrowser()) {
+        setStatus("開かない場合は右上「…」→「ブラウザで開く」をお試しください。");
+      } else {
+        setStatus("開かない場合はもう一度タップしてください。");
+      }
+    }, 1200);
+  }
 
-    // 全画面タップ有効化（“押しやすさ”）
-    fulltap.style.display = "block";
+  openBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    tryOpen();
+  });
 
-    // 初回は自動で一度だけ試す
-    autoKick();
-  </script>
+  fulltap.addEventListener("click", (e) => {
+    e.preventDefault();
+    tryOpen();
+  });
+
+  // 自動トライ（成功端末もある）
+  setTimeout(() => {
+    tryOpen();
+  }, 350);
+</script>
 </body>
 </html>
