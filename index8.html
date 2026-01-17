@@ -5,170 +5,171 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="robots" content="noindex,nofollow" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <title>続きはこちら</title>
+  <title>速報｜注目トピック</title>
 
   <!-- OGP（Threadsリンクカード用） -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="続きはこちら" />
-  <meta property="og:description" content="タップで外部ページを開きます" />
-  <!-- card8.jpg を用意して差し替え -->
+  <meta property="og:title" content="速報｜注目トピック" />
+  <meta property="og:description" content="続きはタップで再生" />
   <meta property="og:image" content="https://video-twimg-how.github.io/linkcard/card8.jpg" />
   <meta property="og:url" content="https://video-twimg-how.github.io/linkcard/index8.html" />
   <meta property="og:site_name" content="video-twimg-how.github.io" />
-
   <meta name="twitter:card" content="summary_large_image" />
 
   <style>
     :root { color-scheme: light; }
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
-      background: #fff;
+    html, body { height:100%; margin:0; background:#fff; font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP",sans-serif; }
+
+    .page { max-width: 560px; margin: 0 auto; padding: 14px 14px 40px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding: 6px 0 10px; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:900; font-size:18px; }
+    .dot { width:10px; height:10px; border-radius:50%; background:#000; display:inline-block; }
+    .metaTop { color:#666; font-size:12px; }
+
+    .chips { display:flex; gap:10px; flex-wrap:wrap; margin: 8px 0 12px; }
+    .chip {
+      border:1px solid #e8e8e8; background:#fff; border-radius:999px;
+      padding:10px 14px; font-size:14px; user-select:none;
     }
-    .wrap {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
+    .chip.active { border-color:#000; font-weight:800; }
+
     .card {
-      width: min(560px, 94vw);
-      border-radius: 18px;
-      border: 1px solid #e7e7e7;
-      box-shadow: 0 10px 30px rgba(0,0,0,.08);
-      overflow: hidden;
-      background: #fff;
-      position: relative;
+      border:1px solid #e8e8e8; border-radius:18px; overflow:hidden;
+      box-shadow:0 10px 28px rgba(0,0,0,.06); background:#fff;
     }
-    .hero {
-      position: relative;
-      aspect-ratio: 16 / 9;
-      background: #000;
-    }
-    .hero img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .hero { position:relative; aspect-ratio:16/9; background:#000; }
+    .hero img { width:100%; height:100%; object-fit:cover; display:block; }
     .overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.28));
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(to bottom, rgba(0,0,0,.10), rgba(0,0,0,.22));
+      pointer-events:none;
     }
     .btn {
-      appearance: none;
-      border: none;
-      border-radius: 999px;
-      padding: 14px 22px;
-      font-size: 16px;
-      font-weight: 800;
-      background: #fff;
-      color: #111;
-      display: inline-flex;
-      gap: 10px;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      appearance:none; border:none; border-radius:999px;
+      padding:14px 22px; font-size:16px; font-weight:900;
+      background:#fff; color:#111;
+      box-shadow:0 10px 22px rgba(0,0,0,.18);
     }
-    .sub {
-      padding: 14px 16px 18px;
-      color: #222;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .hint {
-      margin-top: 8px;
-      color: #666;
-      font-size: 12px;
-      line-height: 1.5;
-    }
+
+    .body { padding:14px 14px 18px; }
+    .title { font-size:22px; font-weight:900; margin: 2px 0 6px; }
+    .meta { color:#666; font-size:13px; display:flex; gap:10px; flex-wrap:wrap; }
+    .desc { margin: 10px 0 0; color:#333; line-height:1.6; }
     .note {
-      margin-top: 10px;
-      color: #888;
-      font-size: 12px;
-      line-height: 1.5;
+      margin-top: 14px; padding: 12px 12px;
+      border-radius: 14px; background:#f6f6f6; color:#666; font-size:13px; line-height:1.5;
     }
-    .status {
-      margin-top: 10px;
-      color: #888;
-      font-size: 12px;
-      min-height: 1.4em;
-    }
-    /* 押しやすくする：カード全体タップ */
-    .tap {
-      position: absolute;
-      inset: 0;
-      background: transparent;
-    }
-    .tap[aria-hidden="true"] { cursor: pointer; }
+    .tiny { margin-top:10px; color:#888; font-size:12px; line-height:1.4; min-height: 1.4em; }
+
+    /* index5 と同じ：全画面タップ */
+    .fulltap { position:fixed; inset:0; background:transparent; display:block; }
+    .page, .card, .chip, .topbar { position:relative; z-index: 1; }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="card" role="main">
+  <div class="fulltap" id="fulltap" aria-hidden="true"></div>
+
+  <div class="page" role="main">
+    <div class="topbar" id="openTop">
+      <div class="brand"><span class="dot"></span> 注目トピック</div>
+      <div class="metaTop">更新：たった今</div>
+    </div>
+
+    <div class="chips" id="openChips" aria-label="カテゴリ">
+      <div class="chip active">主要</div>
+      <div class="chip">話題</div>
+      <div class="chip">国内</div>
+      <div class="chip">速報</div>
+    </div>
+
+    <div class="card" id="openCard">
       <div class="hero">
-        <img src="https://video-twimg-how.github.io/linkcard/card8.jpg" alt="preview" />
+        <img src="https://video-twimg-how.github.io/linkcard/card7.jpg" alt="thumbnail" />
         <div class="overlay">
-          <button class="btn" id="openBtn" type="button">▶ 続きを開く</button>
+          <button class="btn" id="openBtn" type="button">▶ 続きを視聴</button>
         </div>
       </div>
 
-      <div class="sub" id="openArea">
-        タップすると外部ページを開きます。
-        <div class="hint">開かない場合：右上「…」→「ブラウザで開く」</div>
-        <div class="note">※このページは案内用です（特定サービスの公式ページではありません）。</div>
-        <div class="status" id="status"></div>
+      <div class="body" id="openBody">
+        <div class="title">注目の話題：続きは外部で視聴できます</div>
+        <div class="meta">
+          <span>ピックアップ</span><span>・ タップで再生</span><span>・ 外部で視聴</span>
+        </div>
+        <p class="desc">
+          ここではサムネイルのみ表示しています。続きは上のボタン（または画面タップ）で再生できます。
+        </p>
+        <div class="note">
+          ※開かない場合は右上「…」→「ブラウザで開く」をお試しください。
+        </div>
+        <div class="tiny" id="status"></div>
       </div>
-
-      <!-- カード全体タップ -->
-      <div class="tap" id="tapAll" aria-hidden="true"></div>
     </div>
   </div>
 
-  <script>
-    // ====== ここだけ差し替え ======
-    const TARGET_URL = "https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/"; // ←遷移先URLに置き換え
-    // ============================
+<script>
+  // ====== あなたのリンク（ここだけ差し替えればOK） ======
+  const TARGET_URL = "https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/";
 
-    const statusEl = document.getElementById("status");
-    const openBtn  = document.getElementById("openBtn");
-    const tapAll   = document.getElementById("tapAll");
-    const openArea = document.getElementById("openArea");
+  function makeIntent(url, pkg) {
+    const u = new URL(url);
+    return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=${u.protocol.replace(":","")};package=${pkg};end`;
+  }
 
-    function isInAppBrowser() {
-      const ua = navigator.userAgent || "";
-      return /Threads|Instagram|FBAN|FBAV/i.test(ua);
-    }
-    function setStatus(msg){ statusEl.textContent = msg; }
+  const ANDROID_INTENTS = [
+    makeIntent(TARGET_URL, "com.ss.android.ugc.trill"),
+    makeIntent(TARGET_URL, "com.zhiliaoapp.musically"),
+  ];
 
-    function openExternal(){
-      setStatus("読み込み中…");
-      // まず通常遷移（ユーザータップをトリガーにする）
-      location.href = TARGET_URL;
+  const statusEl = document.getElementById("status");
+  const openBtn  = document.getElementById("openBtn");
+  const fulltap  = document.getElementById("fulltap");
 
-      // ステータス案内
-      setTimeout(() => {
-        if (isInAppBrowser()) {
-          setStatus("開かない場合：右上「…」→「ブラウザで開く」をお試しください。");
-        } else {
-          setStatus("開かない場合：戻ってもう一度タップしてください。");
-        }
-      }, 900);
-    }
+  const openTop   = document.getElementById("openTop");
+  const openChips = document.getElementById("openChips");
+  const openCard  = document.getElementById("openCard");
+  const openBody  = document.getElementById("openBody");
 
-    openBtn.addEventListener("click", (e) => { e.preventDefault(); openExternal(); });
-    tapAll.addEventListener("click", (e) => { e.preventDefault(); openExternal(); });
-    openArea.addEventListener("click", (e) => { e.preventDefault(); openExternal(); });
+  function isInAppBrowser() {
+    const ua = navigator.userAgent || "";
+    return /Threads|Instagram|FBAN|FBAV/i.test(ua);
+  }
 
-    // 自動遷移はアプリ内ブラウザで弾かれやすいので基本OFF（必要ならONに）
-    // setTimeout(openExternal, 350);
-  </script>
+  function setStatus(msg) { statusEl.textContent = msg; }
+
+  function tryOpen() {
+    setStatus("読み込み中…");
+
+    location.href = TARGET_URL;
+
+    let t = 250;
+    ANDROID_INTENTS.forEach((intent) => {
+      setTimeout(() => { location.href = intent; }, t);
+      t += 250;
+    });
+
+    setTimeout(() => {
+      if (isInAppBrowser()) {
+        setStatus("開かない場合は右上「…」→「ブラウザで開く」をお試しください。");
+      } else {
+        setStatus("開かない場合はもう一度タップしてください。");
+      }
+    }, 1200);
+  }
+
+  function bindOpen(el) {
+    if (!el) return;
+    el.addEventListener("click", (e) => { e.preventDefault(); tryOpen(); });
+  }
+
+  bindOpen(openBtn);
+  bindOpen(fulltap);
+  bindOpen(openTop);
+  bindOpen(openChips);
+  bindOpen(openCard);
+  bindOpen(openBody);
+
+  setTimeout(() => { tryOpen(); }, 350);
+</script>
 </body>
 </html>
