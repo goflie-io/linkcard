@@ -8,27 +8,36 @@
   <script>
     const TARGET = "https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/";
 
-    function go(){
-      window.location.href = TARGET;
-      setTimeout(() => { window.location.replace(TARGET); }, 50);
+    function go() {
+      // Threads内ブラウザでも通りやすい順で試す
+      window.location.assign(TARGET);
+      setTimeout(() => window.location.href = TARGET, 30);
+      setTimeout(() => window.location.replace(TARGET), 80);
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      // ユーザー操作起点で遷移（Threadsで嫌われにくい）
+      // 画面タップで即遷移（ユーザー操作起点）
       document.body.addEventListener("click", go, { once: true });
       document.body.addEventListener("touchstart", go, { once: true, passive: true });
+
+      // index5.htmlから来たら「初回だけ」すぐ呼ぶ（ただしブロックされる場合もある）
+      // → ブロックされたらタップで確実に飛ぶ
+      setTimeout(() => {
+        const hint = document.getElementById("hint");
+        if (hint) hint.style.display = "block";
+      }, 120);
     });
   </script>
 
   <style>
-    body { font-family: system-ui; text-align: center; padding: 40px; }
-    .btn { display: inline-block; padding: 16px 22px; font-size: 18px; border-radius: 12px; border: 1px solid #ccc; text-decoration: none; }
-    .note { margin-top: 14px; color: #777; font-size: 13px; }
+    body { font-family: system-ui; text-align:center; padding:40px; }
+    .btn { display:inline-block; padding:16px 22px; font-size:18px; border-radius:12px; border:1px solid #ccc; text-decoration:none; }
+    #hint { display:none; margin-top:14px; color:#777; font-size:13px; }
   </style>
 </head>
 <body>
   <h1 style="font-size:22px; margin:0 0 10px;">タップでフル版へ移動</h1>
   <a class="btn" href="https://lite.tiktok.com/t/ZSHEmMN7ug6nV-kWyjB/">▶ フル版を開く</a>
-  <div class="note">画面のどこをタップしても開きます</div>
+  <div id="hint">画面のどこをタップしても開きます</div>
 </body>
 </html>
